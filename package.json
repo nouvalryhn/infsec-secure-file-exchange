@@ -32,10 +32,10 @@
     "recharts": "^3.3.0",
     "sharp": "^0.34.4",
     "tailwind-merge": "^3.3.1",
-    "xlsx": "^0.18.5"
+    "xlsx": "^0.18.5",
+    "bcrypt": "^5.1.1"
   },
   "devDependencies": {
-    "@tailwindcss/postcss": "^4",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.0",
     "@types/bcrypt": "^6.0.0",
@@ -45,12 +45,12 @@
     "@types/react-dom": "^19",
     "@vitest/ui": "^4.0.3",
     "babel-plugin-react-compiler": "1.0.0",
-    "bcrypt": "^6.0.0",
     "eslint": "^9",
     "eslint-config-next": "16.0.0",
     "jsdom": "^27.0.1",
     "prisma": "^6.18.0",
     "tailwindcss": "^4",
+    "@tailwindcss/postcss": "^4.0.0-alpha.26",
     "tsx": "^4.19.2",
     "typescript": "^5",
     "vitest": "^4.0.3"

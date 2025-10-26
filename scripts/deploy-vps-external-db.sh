@@ -210,8 +210,8 @@ build_application() {
         nvm use 22 2>/dev/null || true
     fi
     
-    # Install dependencies with pnpm
-    pnpm install --prod --frozen-lockfile
+    # Install all dependencies (including devDependencies for build)
+    pnpm install --frozen-lockfile
     
     # Generate Prisma client
     pnpm exec prisma generate

@@ -44,9 +44,7 @@ const nextConfig: NextConfig = {
   },
   
   // File upload configuration
-  experimental: {
-    serverComponentsExternalPackages: ['bcrypt'],
-  },
+  serverExternalPackages: ['bcrypt'],
   
   // Environment-specific settings
   env: {
