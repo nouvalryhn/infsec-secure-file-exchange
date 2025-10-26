@@ -303,10 +303,15 @@ main() {
     echo "  Restart: pm2 restart secure-file-exchange"
     echo "  Stop: pm2 stop secure-file-exchange"
     echo ""
-    echo "🔒 Remember to:"
+    echo "🔒 Next Steps:"
     echo "  1. Configure firewall: sudo ufw allow 3000"
-    echo "  2. Set up SSL certificate for production"
-    echo "  3. Monitor memory usage: free -h"
+    echo "  2. Set up domain and port 80: ./scripts/setup-domain.sh"
+    echo "  3. Or run directly on port 80: ./scripts/setup-port80-direct.sh"
+    echo "  4. Monitor memory usage: free -h"
+    echo ""
+    echo "🌐 Domain Setup Options:"
+    echo "  - Nginx + SSL (recommended): ./scripts/setup-domain.sh"
+    echo "  - Direct port 80: ./scripts/setup-port80-direct.sh"
     echo "=========================================="
 }
 
