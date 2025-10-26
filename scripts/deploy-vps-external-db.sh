@@ -186,6 +186,11 @@ EOF
 
     chmod 600 .env.production.local
     
+    # Fix ownership if running with sudo
+    if [[ $EUID -eq 0 && -n "$SUDO_USER" ]]; then
+        chown $SUDO_USER:$SUDO_USER .env.production.local
+    fi
+    
     print_status "Environment file created"
     print_status "VPS IP detected as: ${VPS_IP}"
     print_status "Application will be available at: http://${VPS_IP}:3000"
@@ -197,6 +202,13 @@ build_application() {
     
     # Set Node.js memory limit for build process
     export NODE_OPTIONS="--max-old-space-size=512"
+    
+    # Use sudo with preserved environment for nvm
+    if [[ -f "$HOME/.nvm/nvm.sh" ]]; then
+        print_status "Using nvm environment..."
+        source "$HOME/.nvm/nvm.sh"
+        nvm use 22 2>/dev/null || true
+    fi
     
     # Install dependencies with pnpm
     pnpm install --prod --frozen-lockfile
@@ -213,6 +225,12 @@ build_application() {
 # Setup database
 setup_database() {
     print_status "Setting up database schema..."
+    
+    # Source nvm if available
+    if [[ -f "$HOME/.nvm/nvm.sh" ]]; then
+        source "$HOME/.nvm/nvm.sh"
+        nvm use 22 2>/dev/null || true
+    fi
     
     # Run database migrations
     pnpm exec prisma migrate deploy
@@ -235,12 +253,27 @@ setup_file_storage() {
 setup_pm2() {
     print_status "Setting up PM2 process manager..."
     
-    # Create PM2 ecosystem file for pnpm
+    # Source nvm if available
+    if [[ -f "$HOME/.nvm/nvm.sh" ]]; then
+        source "$HOME/.nvm/nvm.sh"
+        nvm use 22 2>/dev/null || true
+    fi
+    
+    # Install PM2 if not available
+    if ! command -v pm2 &> /dev/null; then
+        print_status "Installing PM2..."
+        pnpm add -g pm2
+    fi
+    
+    # Get the full path to pnpm for PM2
+    PNPM_PATH=$(which pnpm)
+    
+    # Create PM2 ecosystem file for pnpm with full path
     cat > ecosystem.config.js << EOF
 module.exports = {
   apps: [{
     name: 'secure-file-exchange',
-    script: 'pnpm',
+    script: '${PNPM_PATH}',
     args: 'start',
     instances: 1,
     exec_mode: 'fork',
@@ -248,7 +281,8 @@ module.exports = {
     node_args: '--max-old-space-size=256',
     env: {
       NODE_ENV: 'production',
-      PORT: 3000
+      PORT: 3000,
+      PATH: process.env.PATH
     },
     error_file: '/var/log/secure-file-exchange-error.log',
     out_file: '/var/log/secure-file-exchange-out.log',
@@ -293,8 +327,27 @@ main() {
     generate_keys
     get_database_url
     create_env_file
-    build_application
-    setup_database
+    
+    # Run build steps as the original user if using sudo
+    if [[ $EUID -eq 0 && -n "$SUDO_USER" ]]; then
+        print_status "Running build as user $SUDO_USER..."
+        sudo -u $SUDO_USER -H bash -c "
+            cd $(pwd)
+            source ~/.bashrc 2>/dev/null || true
+            if [[ -f ~/.nvm/nvm.sh ]]; then
+                source ~/.nvm/nvm.sh
+                nvm use 22 2>/dev/null || true
+            fi
+            $(declare -f build_application)
+            build_application
+            $(declare -f setup_database)
+            setup_database
+        "
+    else
+        build_application
+        setup_database
+    fi
+    
     setup_file_storage
     setup_pm2
     health_check
