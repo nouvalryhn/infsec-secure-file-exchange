@@ -2,17 +2,17 @@
 
 :root {
   --background: #ffffff;
-  --foreground: #1e293b;
+  --foreground: #0f172a;
   --card: #ffffff;
-  --card-foreground: #1e293b;
+  --card-foreground: #0f172a;
   --primary: #2563eb;
   --primary-foreground: #ffffff;
-  --secondary: #f1f5f9;
-  --secondary-foreground: #1e293b;
-  --muted: #f8fafc;
-  --muted-foreground: #64748b;
+  --secondary: #f8fafc;
+  --secondary-foreground: #0f172a;
+  --muted: #f1f5f9;
+  --muted-foreground: #475569;
   --accent: #f1f5f9;
-  --accent-foreground: #1e293b;
+  --accent-foreground: #0f172a;
   --destructive: #dc2626;
   --destructive-foreground: #ffffff;
   --border: #e2e8f0;
@@ -27,52 +27,53 @@
 }
 
 .dark {
-  --background: #020617;
-  --foreground: #f1f5f9;
-  --card: #0f172a;
-  --card-foreground: #f1f5f9;
+  --background: #0f172a;
+  --foreground: #f8fafc;
+  --card: #1e293b;
+  --card-foreground: #f8fafc;
   --primary: #3b82f6;
   --primary-foreground: #ffffff;
-  --secondary: #1e293b;
-  --secondary-foreground: #f1f5f9;
-  --muted: #1e293b;
-  --muted-foreground: #94a3b8;
-  --accent: #1e293b;
-  --accent-foreground: #f1f5f9;
+  --secondary: #334155;
+  --secondary-foreground: #f8fafc;
+  --muted: #334155;
+  --muted-foreground: #cbd5e1;
+  --accent: #334155;
+  --accent-foreground: #f8fafc;
   --destructive: #ef4444;
   --destructive-foreground: #ffffff;
-  --border: #334155;
-  --input: #1e293b;
+  --border: #475569;
+  --input: #334155;
   --ring: #3b82f6;
   --success: #22c55e;
   --success-foreground: #ffffff;
   --warning: #eab308;
-  --warning-foreground: #000000;
+  --warning-foreground: #0f172a;
   --info: #06b6d4;
   --info-foreground: #ffffff;
 }
 
 * {
-  border-color: hsl(var(--border));
+  border-color: var(--border);
 }
 
 body {
   background-color: var(--background);
   color: var(--foreground);
-  font-family: system-ui, -apple-system, sans-serif;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  line-height: 1.6;
 }
 
-/* Ensure proper contrast for all text elements */
+/* Enhanced text visibility */
 .text-slate-900 {
-  color: #0f172a;
+  color: #0f172a !important;
 }
 
 .dark .text-slate-900 {
-  color: #f1f5f9 !important;
+  color: #f8fafc !important;
 }
 
 .text-slate-800 {
-  color: #1e293b;
+  color: #1e293b !important;
 }
 
 .dark .text-slate-800 {
@@ -80,7 +81,7 @@ body {
 }
 
 .text-slate-700 {
-  color: #334155;
+  color: #334155 !important;
 }
 
 .dark .text-slate-700 {
@@ -88,7 +89,7 @@ body {
 }
 
 .text-slate-600 {
-  color: #475569;
+  color: #475569 !important;
 }
 
 .dark .text-slate-600 {
@@ -96,84 +97,198 @@ body {
 }
 
 .text-slate-500 {
-  color: #64748b;
+  color: #64748b !important;
 }
 
 .dark .text-slate-500 {
-  color: #64748b !important;
+  color: #94a3b8 !important;
 }
 
 .text-slate-400 {
-  color: #94a3b8;
+  color: #94a3b8 !important;
 }
 
 .dark .text-slate-400 {
-  color: #64748b !important;
+  color: #cbd5e1 !important;
 }
 
-/* Ensure white text is visible in dark mode */
+.text-slate-300 {
+  color: #cbd5e1 !important;
+}
+
+.dark .text-slate-300 {
+  color: #e2e8f0 !important;
+}
+
+/* Ensure white text is always visible */
 .text-white {
-  color: #ffffff;
-}
-
-.dark .text-white {
   color: #ffffff !important;
 }
 
-/* Fix background colors for better contrast */
+/* Enhanced background colors */
 .bg-slate-50 {
-  background-color: #f8fafc;
+  background-color: #f8fafc !important;
 }
 
 .dark .bg-slate-50 {
-  background-color: #0f172a !important;
-}
-
-.bg-slate-100 {
-  background-color: #f1f5f9;
-}
-
-.dark .bg-slate-100 {
   background-color: #1e293b !important;
 }
 
-.bg-slate-800 {
-  background-color: #1e293b;
+.bg-slate-100 {
+  background-color: #f1f5f9 !important;
 }
 
-.dark .bg-slate-800 {
+.dark .bg-slate-100 {
   background-color: #334155 !important;
 }
 
+.bg-slate-200 {
+  background-color: #e2e8f0 !important;
+}
+
+.dark .bg-slate-200 {
+  background-color: #475569 !important;
+}
+
+.bg-slate-800 {
+  background-color: #1e293b !important;
+}
+
+.dark .bg-slate-800 {
+  background-color: #475569 !important;
+}
+
 .bg-slate-900 {
-  background-color: #0f172a;
+  background-color: #0f172a !important;
 }
 
 .dark .bg-slate-900 {
-  background-color: #020617 !important;
+  background-color: #334155 !important;
 }
 
-/* Fix border colors */
+/* Enhanced border colors */
 .border-slate-200 {
-  border-color: #e2e8f0;
+  border-color: #e2e8f0 !important;
 }
 
 .dark .border-slate-200 {
-  border-color: #334155 !important;
+  border-color: #475569 !important;
 }
 
 .border-slate-300 {
-  border-color: #cbd5e1;
+  border-color: #cbd5e1 !important;
 }
 
 .dark .border-slate-300 {
-  border-color: #475569 !important;
+  border-color: #64748b !important;
 }
 
 .border-slate-700 {
-  border-color: #334155;
+  border-color: #334155 !important;
 }
 
 .dark .border-slate-700 {
-  border-color: #475569 !important;
+  border-color: #64748b !important;
+}
+
+/* Input and form elements */
+input, textarea, select {
+  background-color: var(--input) !important;
+  color: var(--foreground) !important;
+  border-color: var(--border) !important;
+}
+
+.dark input, .dark textarea, .dark select {
+  background-color: var(--input) !important;
+  color: var(--foreground) !important;
+  border-color: var(--border) !important;
+}
+
+/* Button enhancements */
+button {
+  transition: all 0.2s ease-in-out;
+}
+
+/* Card and container enhancements */
+.card {
+  background-color: var(--card) !important;
+  color: var(--card-foreground) !important;
+  border-color: var(--border) !important;
+}
+
+/* Link enhancements */
+a {
+  color: var(--primary) !important;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+/* Table enhancements */
+table {
+  background-color: var(--card) !important;
+  color: var(--card-foreground) !important;
+}
+
+th {
+  background-color: var(--muted) !important;
+  color: var(--muted-foreground) !important;
+  font-weight: 600;
+}
+
+td {
+  border-color: var(--border) !important;
+}
+
+/* Navigation enhancements */
+nav {
+  background-color: var(--card) !important;
+  border-color: var(--border) !important;
+}
+
+/* Alert and status colors */
+.alert-success {
+  background-color: var(--success) !important;
+  color: var(--success-foreground) !important;
+}
+
+.alert-warning {
+  background-color: var(--warning) !important;
+  color: var(--warning-foreground) !important;
+}
+
+.alert-error {
+  background-color: var(--destructive) !important;
+  color: var(--destructive-foreground) !important;
+}
+
+.alert-info {
+  background-color: var(--info) !important;
+  color: var(--info-foreground) !important;
+}
+
+/* Focus states */
+*:focus {
+  outline: 2px solid var(--ring) !important;
+  outline-offset: 2px;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--muted);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--muted-foreground);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--foreground);
 }
