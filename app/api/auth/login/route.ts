@@ -5,14 +5,16 @@ import { saveSession, generateSessionKey } from '@/lib/auth/session';
 import { withErrorHandler, createValidationError, createAuthenticationError } from '@/lib/error-handler';
 import { authLogger } from '@/lib/logger';
 
+// Updated to support persistent session keys for file encryption
+
 async function loginHandler(request: NextRequest) {
   const body = await request.json();
   const { username, password } = body;
 
   // Get client IP for logging
-  const clientIP = request.headers.get('x-forwarded-for') || 
-                   request.headers.get('x-real-ip') || 
-                   'unknown';
+  const clientIP = request.headers.get('x-forwarded-for') ||
+    request.headers.get('x-real-ip') ||
+    'unknown';
 
   // Validate input
   if (!username || !password) {
@@ -32,6 +34,7 @@ async function loginHandler(request: NextRequest) {
       id: true,
       username: true,
       passwordHash: true,
+      sessionKey: true,
     },
   });
 
@@ -48,8 +51,19 @@ async function loginHandler(request: NextRequest) {
     throw createAuthenticationError('INVALID_CREDENTIALS', 'Invalid username or password');
   }
 
-  // Generate session key for encryption operations
-  const sessionKey = generateSessionKey();
+  // Get or generate session key for encryption operations
+  let sessionKey = user.sessionKey;
+
+  if (!sessionKey) {
+    // Generate new session key for first-time login
+    sessionKey = generateSessionKey();
+
+    // Store the session key in the database for future logins
+    await prisma.user.update({
+      where: { id: user.id },
+      data: { sessionKey }
+    });
+  }
 
   // Create session
   await saveSession({

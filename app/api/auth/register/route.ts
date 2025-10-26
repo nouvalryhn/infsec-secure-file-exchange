@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { hashPassword } from '@/lib/auth/password';
+import { generateSessionKey } from '@/lib/auth/session';
 import { withErrorHandler, createValidationError, createConflictError } from '@/lib/error-handler';
 import { authLogger } from '@/lib/logger';
 
@@ -44,11 +45,15 @@ async function registerHandler(request: NextRequest) {
   // Hash password
   const passwordHash = await hashPassword(password);
 
+  // Generate session key for encryption operations
+  const sessionKey = generateSessionKey();
+
   // Create user in database
   const user = await prisma.user.create({
     data: {
       username,
       passwordHash,
+      sessionKey,
     },
     select: {
       id: true,

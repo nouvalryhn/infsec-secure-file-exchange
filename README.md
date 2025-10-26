@@ -340,6 +340,7 @@ test/
 - RC4 stream cipher (for educational comparison)
 - Cryptographically secure key generation
 - No hard-coded encryption keys
+- Persistent session keys for consistent file decryption across login sessions
 
 ### File Security
 - Files are encrypted before storage
