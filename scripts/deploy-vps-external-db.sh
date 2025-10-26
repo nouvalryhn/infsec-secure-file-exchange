@@ -68,25 +68,35 @@ optimize_system() {
     print_status "System optimization completed"
 }
 
-# Install dependencies
-install_dependencies() {
-    print_status "Installing Node.js dependencies..."
+# Verify dependencies
+verify_dependencies() {
+    print_status "Verifying existing dependencies..."
     
-    # Update package list
-    sudo apt update
-    
-    # Install Node.js 18 (if not installed)
+    # Check Node.js version
     if ! command -v node &> /dev/null; then
-        curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
-        sudo apt-get install -y nodejs
+        print_error "Node.js is not installed!"
+        exit 1
     fi
     
-    # Install PM2 for process management
+    node_version=$(node -v)
+    print_status "Node.js version: $node_version"
+    
+    # Check pnpm
+    if ! command -v pnpm &> /dev/null; then
+        print_error "pnpm is not installed!"
+        exit 1
+    fi
+    
+    pnpm_version=$(pnpm -v)
+    print_status "pnpm version: $pnpm_version"
+    
+    # Install PM2 with pnpm if not installed
     if ! command -v pm2 &> /dev/null; then
-        sudo npm install -g pm2
+        print_status "Installing PM2 with pnpm..."
+        pnpm add -g pm2
     fi
     
-    print_status "Dependencies installed"
+    print_status "Dependencies verified successfully"
 }
 
 # Generate secure keys
@@ -183,19 +193,19 @@ EOF
 
 # Build application
 build_application() {
-    print_status "Building application..."
+    print_status "Building application with pnpm..."
     
     # Set Node.js memory limit for build process
     export NODE_OPTIONS="--max-old-space-size=512"
     
-    # Install dependencies
-    npm ci --only=production
+    # Install dependencies with pnpm
+    pnpm install --prod --frozen-lockfile
     
     # Generate Prisma client
-    npx prisma generate
+    pnpm exec prisma generate
     
     # Build Next.js application
-    npm run build
+    pnpm run build
     
     print_status "Application built successfully"
 }
@@ -205,7 +215,7 @@ setup_database() {
     print_status "Setting up database schema..."
     
     # Run database migrations
-    npx prisma migrate deploy
+    pnpm exec prisma migrate deploy
     
     print_status "Database schema setup completed"
 }
@@ -225,12 +235,12 @@ setup_file_storage() {
 setup_pm2() {
     print_status "Setting up PM2 process manager..."
     
-    # Create PM2 ecosystem file
+    # Create PM2 ecosystem file for pnpm
     cat > ecosystem.config.js << EOF
 module.exports = {
   apps: [{
     name: 'secure-file-exchange',
-    script: 'npm',
+    script: 'pnpm',
     args: 'start',
     instances: 1,
     exec_mode: 'fork',
@@ -279,7 +289,7 @@ main() {
     # Run deployment steps
     check_system_resources
     optimize_system
-    install_dependencies
+    verify_dependencies
     generate_keys
     get_database_url
     create_env_file

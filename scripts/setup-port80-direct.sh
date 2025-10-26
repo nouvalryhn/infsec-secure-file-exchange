@@ -47,12 +47,12 @@ get_domain_info() {
 update_pm2_config() {
     print_status "Updating PM2 configuration for port 80..."
     
-    # Create new PM2 ecosystem file for port 80
+    # Create new PM2 ecosystem file for port 80 with pnpm
     cat > ecosystem.config.js << EOF
 module.exports = {
   apps: [{
     name: 'secure-file-exchange',
-    script: 'npm',
+    script: 'pnpm',
     args: 'start',
     instances: 1,
     exec_mode: 'fork',
@@ -70,7 +70,7 @@ module.exports = {
 };
 EOF
     
-    print_status "PM2 configuration updated for port 80"
+    print_status "PM2 configuration updated for port 80 with pnpm"
 }
 
 # Update application environment
