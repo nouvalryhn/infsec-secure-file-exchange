@@ -243,6 +243,11 @@ setup_database() {
         nvm use 22 2>/dev/null || true
     fi
     
+    # Load environment variables for Prisma
+    if [[ -f .env.production.local ]]; then
+        export $(grep -v '^#' .env.production.local | xargs)
+    fi
+    
     # Run database migrations
     pnpm exec prisma migrate deploy
     

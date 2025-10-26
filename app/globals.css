@@ -1,4 +1,6 @@
-@import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 :root {
   --background: #ffffff;
@@ -24,6 +26,7 @@
   --warning-foreground: #ffffff;
   --info: #0ea5e9;
   --info-foreground: #ffffff;
+  --radius: 0.5rem;
 }
 
 .dark {
@@ -50,6 +53,7 @@
   --warning-foreground: #000000;
   --info: #06b6d4;
   --info-foreground: #ffffff;
+  --radius: 0.5rem;
 }
 
 * {
