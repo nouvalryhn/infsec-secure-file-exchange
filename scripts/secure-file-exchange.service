@@ -1,0 +1,39 @@
+[Unit]
+Description=Secure File Exchange System
+Documentation=https://github.com/your-org/secure-file-exchange
+After=network.target mysql.service
+Wants=mysql.service
+
+[Service]
+Type=simple
+User=www-data
+Group=www-data
+WorkingDirectory=/var/www/secure-file-exchange
+Environment=NODE_ENV=production
+Environment=PORT=3000
+EnvironmentFile=/var/www/secure-file-exchange/.env.production.local
+ExecStart=/usr/bin/npm start
+ExecReload=/bin/kill -HUP $MAINPID
+KillMode=mixed
+KillSignal=SIGINT
+TimeoutStopSec=5
+PrivateTmp=true
+RestartSec=5
+Restart=always
+
+# Security settings
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/www/secure-file-exchange/uploads
+ReadWritePaths=/var/log
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+
+# Resource limits
+LimitNOFILE=65536
+LimitNPROC=4096
+
+[Install]
+WantedBy=multi-user.target

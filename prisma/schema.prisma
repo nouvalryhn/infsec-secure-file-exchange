@@ -1,0 +1,123 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String   @id @default(uuid())
+  username     String   @unique
+  passwordHash String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  
+  files          File[]
+  reports        FinancialReport[]
+  sharesOwned    FileShare[] @relation("ShareOwner")
+  sharesReceived FileShare[] @relation("ShareRecipient")
+}
+
+model File {
+  id            String   @id @default(uuid())
+  userId        String
+  originalName  String
+  fileType      FileType
+  uploadedAt    DateTime @default(now())
+  
+  aesPath       String
+  desPath       String
+  rc4Path       String
+  
+  originalSize  Int
+  mimeType      String
+  
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  metrics       EncryptionMetric[]
+  shares        FileShare[]
+  report        FinancialReport?
+  
+  @@index([userId])
+}
+
+enum FileType {
+  EXCEL
+  IMAGE
+}
+
+model EncryptionMetric {
+  id              String   @id @default(uuid())
+  fileId          String
+  algorithm       Algorithm
+  encryptionTime  Float
+  decryptionTime  Float?
+  ciphertextSize  Int
+  dataType        DataType
+  createdAt       DateTime @default(now())
+  
+  file            File     @relation(fields: [fileId], references: [id], onDelete: Cascade)
+  
+  @@index([fileId])
+  @@index([algorithm])
+  @@index([dataType])
+}
+
+enum Algorithm {
+  AES
+  DES
+  RC4
+}
+
+enum DataType {
+  NUMERICAL
+  SPREADSHEET
+  IMAGE
+}
+
+model FinancialReport {
+  id        String   @id @default(uuid())
+  fileId    String   @unique
+  userId    String
+  createdAt DateTime @default(now())
+  
+  file      File     @relation(fields: [fileId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  data      EncryptedReportField[]
+  
+  @@index([userId])
+}
+
+model EncryptedReportField {
+  id             String   @id @default(uuid())
+  reportId       String
+  fieldName      String
+  encryptedValue String   @db.Text
+  algorithm      Algorithm
+  iv             String?
+  
+  report         FinancialReport @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  
+  @@index([reportId])
+}
+
+model FileShare {
+  id              String   @id @default(uuid())
+  fileId          String
+  ownerId         String
+  sharedWithUserId String
+  sharedAt        DateTime @default(now())
+  
+  file            File     @relation(fields: [fileId], references: [id], onDelete: Cascade)
+  owner           User     @relation("ShareOwner", fields: [ownerId], references: [id], onDelete: Cascade)
+  sharedWith      User     @relation("ShareRecipient", fields: [sharedWithUserId], references: [id], onDelete: Cascade)
+  
+  @@unique([fileId, sharedWithUserId])
+  @@index([fileId])
+  @@index([ownerId])
+  @@index([sharedWithUserId])
+}

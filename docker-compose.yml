@@ -1,0 +1,50 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=mysql://secure_user:secure_password@db:3306/secure_file_exchange?connection_limit=10&pool_timeout=20
+      - SESSION_SECRET=your-production-session-secret-min-32-characters-long
+      - ENCRYPTION_KEY=your-production-encryption-key-32-chars
+      - MAX_FILE_SIZE=10485760
+      - UPLOAD_DIR=/app/uploads
+      - NEXT_PUBLIC_APP_URL=http://localhost:3000
+    volumes:
+      - uploads:/app/uploads
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - secure-network
+
+  db:
+    image: mysql:8.0
+    environment:
+      - MYSQL_ROOT_PASSWORD=root_password
+      - MYSQL_DATABASE=secure_file_exchange
+      - MYSQL_USER=secure_user
+      - MYSQL_PASSWORD=secure_password
+    volumes:
+      - db_data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 20s
+      retries: 10
+    restart: unless-stopped
+    networks:
+      - secure-network
+
+volumes:
+  db_data:
+  uploads:
+
+networks:
+  secure-network:
+    driver: bridge

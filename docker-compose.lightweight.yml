@@ -1,0 +1,67 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=mysql://secure_user:secure_password@db:3306/secure_file_exchange?connection_limit=5&pool_timeout=30
+      - SESSION_SECRET=your-production-session-secret-min-32-characters-long
+      - ENCRYPTION_KEY=your-production-encryption-key-32-chars
+      - MAX_FILE_SIZE=5242880
+      - UPLOAD_DIR=/app/uploads
+      - NEXT_PUBLIC_APP_URL=http://your-vps-ip:3000
+    volumes:
+      - uploads:/app/uploads
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - secure-network
+    # Memory limits for 1GB VPS
+    mem_limit: 400m
+    memswap_limit: 400m
+    cpus: 1.5
+
+  db:
+    image: mysql:8.0
+    command: --default-authentication-plugin=mysql_native_password
+      --innodb-buffer-pool-size=128M
+      --innodb-log-file-size=32M
+      --innodb-flush-method=O_DIRECT
+      --innodb-flush-log-at-trx-commit=2
+      --max-connections=20
+      --table-open-cache=200
+      --query-cache-size=0
+      --query-cache-type=0
+    environment:
+      - MYSQL_ROOT_PASSWORD=root_password
+      - MYSQL_DATABASE=secure_file_exchange
+      - MYSQL_USER=secure_user
+      - MYSQL_PASSWORD=secure_password
+    volumes:
+      - db_data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 20s
+      retries: 10
+    restart: unless-stopped
+    networks:
+      - secure-network
+    # Memory limits for MySQL
+    mem_limit: 300m
+    memswap_limit: 300m
+    cpus: 0.5
+
+volumes:
+  db_data:
+  uploads:
+
+networks:
+  secure-network:
+    driver: bridge
