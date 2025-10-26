@@ -19,6 +19,7 @@ import {
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import { ThemeToggle } from '@/components/ui/theme-toggle';
 
 interface NavigationProps {
   user?: {
@@ -69,6 +70,7 @@ export function Navigation({ user, currentPath }: NavigationProps) {
             </Link>
             
             <div className="flex items-center gap-4">
+              <ThemeToggle />
               <Button variant="ghost" asChild>
                 <Link href="/login">Sign In</Link>
               </Button>
@@ -120,6 +122,7 @@ export function Navigation({ user, currentPath }: NavigationProps) {
 
           {/* Desktop User Menu */}
           <div className="hidden md:flex items-center gap-4">
+            <ThemeToggle />
             <Button size="sm" asChild>
               <Link href="/upload" className="flex items-center gap-2">
                 <Plus className="w-4 h-4" />
@@ -211,6 +214,11 @@ export function Navigation({ user, currentPath }: NavigationProps) {
               })}
               
               <div className="border-t border-gray-200 dark:border-gray-700 pt-2 mt-2">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm text-gray-600 dark:text-gray-400">Theme</span>
+                  <ThemeToggle />
+                </div>
+                
                 <Button
                   variant="ghost"
                   size="sm"
