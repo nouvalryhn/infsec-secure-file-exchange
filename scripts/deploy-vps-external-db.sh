@@ -213,9 +213,16 @@ build_application() {
     # Clean old build artifacts and lockfile if they exist
     rm -rf .next node_modules 2>/dev/null || true
     
+    # Install build tools for native modules
+    sudo apt update
+    sudo apt install -y build-essential python3-dev
+    
     # Install all dependencies (including devDependencies for build)
     # Use --no-frozen-lockfile to update lockfile with new package versions
     pnpm install --no-frozen-lockfile
+    
+    # Rebuild native modules for current system
+    pnpm rebuild bcrypt
     
     # Generate Prisma client
     pnpm exec prisma generate
