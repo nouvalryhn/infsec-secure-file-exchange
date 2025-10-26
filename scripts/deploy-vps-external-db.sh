@@ -210,8 +210,12 @@ build_application() {
         nvm use 22 2>/dev/null || true
     fi
     
+    # Clean old build artifacts and lockfile if they exist
+    rm -rf .next node_modules 2>/dev/null || true
+    
     # Install all dependencies (including devDependencies for build)
-    pnpm install --frozen-lockfile
+    # Use --no-frozen-lockfile to update lockfile with new package versions
+    pnpm install --no-frozen-lockfile
     
     # Generate Prisma client
     pnpm exec prisma generate
