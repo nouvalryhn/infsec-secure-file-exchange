@@ -35,13 +35,14 @@ async function downloadHandler(
   }
   const accessType = accessResult.accessType;
 
-  // Get file details
+  // Get file details including owner's session key for decryption
   const file = await prisma.file.findUnique({
     where: { id: fileId },
     include: {
       user: {
         select: {
-          username: true
+          username: true,
+          sessionKey: true
         }
       },
       metrics: {
@@ -70,9 +71,13 @@ async function downloadHandler(
   const orchestrator = new FileEncryptionOrchestrator();
 
   try {
-    // Derive the file-specific key from session key
-    const sessionKeyBuffer = Buffer.from(session.sessionKey, 'base64');
-    const fileKey = KeyManager.deriveFileKey(sessionKeyBuffer, fileId, algorithmEnum);
+    // Use the file owner's session key for decryption (not the current user's session key)
+    if (!file.user.sessionKey) {
+      throw new Error('File owner does not have a session key. File cannot be decrypted.');
+    }
+    
+    const ownerSessionKeyBuffer = Buffer.from(file.user.sessionKey, 'base64');
+    const fileKey = KeyManager.deriveFileKey(ownerSessionKeyBuffer, fileId, algorithmEnum);
 
     // Decrypt the file (IV extraction is handled inside the orchestrator)
     const decryptionResult = await orchestrator.decryptFile(algorithmEnum, fileId, fileKey);

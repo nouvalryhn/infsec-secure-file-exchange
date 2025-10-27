@@ -26,14 +26,19 @@ async function thumbnailHandler(
     throw createNotFoundError('FILE_NOT_FOUND', 'File not found or access denied');
   }
 
-  // Get file details
+  // Get file details including owner's session key for decryption
   const file = await prisma.file.findUnique({
     where: { id: fileId },
     select: {
       id: true,
       originalName: true,
       fileType: true,
-      mimeType: true
+      mimeType: true,
+      user: {
+        select: {
+          sessionKey: true
+        }
+      }
     }
   });
 
@@ -50,9 +55,13 @@ async function thumbnailHandler(
     // Initialize orchestrator
     const orchestrator = new FileEncryptionOrchestrator();
 
-    // Derive the file-specific key from session key (using AES for thumbnails)
-    const sessionKeyBuffer = Buffer.from(session.sessionKey, 'base64');
-    const fileKey = KeyManager.deriveFileKey(sessionKeyBuffer, fileId, Algorithm.AES);
+    // Use the file owner's session key for decryption (using AES for thumbnails)
+    if (!file.user.sessionKey) {
+      throw new Error('File owner does not have a session key. File cannot be decrypted.');
+    }
+    
+    const ownerSessionKeyBuffer = Buffer.from(file.user.sessionKey, 'base64');
+    const fileKey = KeyManager.deriveFileKey(ownerSessionKeyBuffer, fileId, Algorithm.AES);
 
     // Decrypt the file using AES
     const decryptionResult = await orchestrator.decryptFile(Algorithm.AES, fileId, fileKey);

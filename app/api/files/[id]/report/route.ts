@@ -26,7 +26,7 @@ export async function GET(
       return NextResponse.json({ error: 'File not found or access denied' }, { status: 404 });
     }
 
-    // Get file details
+    // Get file details including owner's session key for decryption
     const file = await prisma.file.findUnique({
       where: { id: fileId },
       include: {
@@ -37,7 +37,8 @@ export async function GET(
         },
         user: {
           select: {
-            username: true
+            username: true,
+            sessionKey: true
           }
         }
       }
@@ -56,8 +57,12 @@ export async function GET(
     const desEncryptor = new DESEncryptor();
     const rc4Encryptor = new RC4Encryptor();
 
-    // Get session key for key derivation
-    const sessionKeyBuffer = Buffer.from(session.sessionKey, 'base64');
+    // Use the file owner's session key for decryption
+    if (!file.user.sessionKey) {
+      return NextResponse.json({ error: 'File owner does not have a session key. Report cannot be decrypted.' }, { status: 500 });
+    }
+    
+    const ownerSessionKeyBuffer = Buffer.from(file.user.sessionKey, 'base64');
 
     // Group encrypted fields by field name and algorithm
     const fieldsByName: Record<string, Record<Algorithm, any>> = {};
@@ -88,9 +93,9 @@ export async function GET(
         const alg = algorithm as Algorithm;
         
         try {
-          // Derive field-specific key for this algorithm
+          // Derive field-specific key for this algorithm using owner's session key
           const fieldKey = KeyManager.deriveFileKey(
-            sessionKeyBuffer, 
+            ownerSessionKeyBuffer, 
             `${fileId}_${fieldName}`, 
             alg
           );

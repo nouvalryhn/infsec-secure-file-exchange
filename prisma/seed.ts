@@ -1,5 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcrypt';
+import { generateSessionKey } from '../lib/auth/session';
 
 const prisma = new PrismaClient();
 
@@ -8,13 +9,15 @@ async function main() {
 
   // Create a demo user
   const hashedPassword = await bcrypt.hash('demo123', 10);
-  
+  const demoSessionKey = generateSessionKey();
+
   const demoUser = await prisma.user.upsert({
     where: { username: 'demo' },
     update: {},
     create: {
       username: 'demo',
       passwordHash: hashedPassword,
+      sessionKey: demoSessionKey,
     },
   });
 
@@ -22,13 +25,15 @@ async function main() {
 
   // Create an admin user
   const adminHashedPassword = await bcrypt.hash('admin123', 10);
-  
+  const adminSessionKey = generateSessionKey();
+
   const adminUser = await prisma.user.upsert({
     where: { username: 'admin' },
     update: {},
     create: {
       username: 'admin',
       passwordHash: adminHashedPassword,
+      sessionKey: adminSessionKey,
     },
   });
 
